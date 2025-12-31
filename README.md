@@ -148,6 +148,39 @@ docker run \
 | `make dev` | Start API server |
 | `make job` | Run K8s job |
 | `make notebook` | Start Jupyter |
+| `make test` | Run tests |
+| `make lint` | Run linter |
+| `make fmt` | Format code |
+| `make check` | Run lint and format |
+| `make setup-k8s` | Setup Kubernetes cluster (kind) |
+| `make build-image` | Build Docker image |
+| `make load-image` | Build and load image to kind |
+| `make clean-k8s` | Delete Kubernetes cluster |
+| `make reset-k8s` | Reset Kubernetes cluster (delete and recreate) |
+| `make clean-image` | Delete Docker image |
+
+## Kubernetes
+
+```bash
+# Setup local Kubernetes cluster
+make setup-k8s
+
+# Build and load Docker image
+make load-image
+
+# Reset cluster (if needed)
+make reset-k8s
+
+# Create a Job via API
+curl -X POST "http://localhost:8000/analysis/jobs" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dataset_url": "https://example.com/data.csv",
+    "target_date": "2024-01-01"
+  }'
+```
+
+詳細なコマンドリファレンスは [KUBERNETES.md](./KUBERNETES.md) を参照してください。
 
 ## License
 

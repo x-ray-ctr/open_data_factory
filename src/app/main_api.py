@@ -3,7 +3,6 @@
 from fastapi import FastAPI
 
 from app.infrastructure.config.settings import Settings
-from app.interface.api.analysis_controller import router
 from app.wiring import build_job_launcher, build_usecase
 
 
@@ -23,18 +22,16 @@ def create_app() -> FastAPI:
     usecase = build_usecase(settings)
     job_launcher = build_job_launcher(settings)
 
-    # 依存注入用の関数を上書き
-    async def get_usecase_impl():
-        return usecase
+    # ルーターをインポート
+    from app.interface.api.analysis_controller import (
+        get_job_launcher,
+        get_usecase,
+        router,
+    )
 
-    async def get_job_launcher_impl():
-        return job_launcher
-
-    # グローバル関数を上書き
-    import app.interface.api.analysis_controller as controller_module
-
-    controller_module.get_usecase = get_usecase_impl
-    controller_module.get_job_launcher = get_job_launcher_impl
+    # FastAPIのdependency_overridesを使用して依存関係を設定
+    app.dependency_overrides[get_usecase] = lambda: usecase
+    app.dependency_overrides[get_job_launcher] = lambda: job_launcher
 
     # ルーターを登録
     app.include_router(router)

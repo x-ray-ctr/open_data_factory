@@ -37,7 +37,11 @@ class S3ResultRepository(ResultRepository):
         # Parquet形式で保存
         # 実際の実装では、boto3やs3fsを使用
         # ここでは例として、ローカルファイルシステムに保存する想定
-        local_path = f"/tmp/{target_date}/result.parquet"
+        import os
+
+        local_dir = f"/tmp/{target_date}"
+        os.makedirs(local_dir, exist_ok=True)
+        local_path = f"{local_dir}/result.parquet"
         result.data.write_parquet(local_path)
 
         # TODO: 実際のS3へのアップロード処理を実装
