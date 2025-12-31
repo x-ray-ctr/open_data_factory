@@ -1,4 +1,5 @@
 """分析APIのコントローラー"""
+
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
@@ -27,12 +28,14 @@ def get_job_launcher() -> JobLauncher:
 
 class AnalysisRequest(BaseModel):
     """分析リクエスト"""
+
     dataset_url: str
     target_date: str
 
 
 class AnalysisResponse(BaseModel):
     """分析レスポンス"""
+
     success: bool
     result_path: str | None
     message: str
@@ -45,12 +48,12 @@ async def create_analysis_job(
 ) -> AnalysisResponse:
     """
     分析Jobを作成して起動する
-    
+
     Args:
         request: 分析リクエスト
         usecase: 分析実行ユースケース
         job_launcher: Job起動器
-        
+
     Returns:
         分析レスポンス
     """
@@ -61,7 +64,7 @@ async def create_analysis_job(
             dataset_url=request.dataset_url,
             target_date=request.target_date,
         )
-        
+
         return AnalysisResponse(
             success=True,
             result_path=None,
@@ -78,11 +81,11 @@ async def get_job_status(
 ) -> Dict[str, Any]:
     """
     Jobの状態を取得する
-    
+
     Args:
         job_id: Job ID
         job_launcher: Job起動器
-        
+
     Returns:
         Jobの状態
     """
@@ -100,11 +103,11 @@ async def run_analysis(
 ) -> AnalysisResponse:
     """
     分析を直接実行する（開発・テスト用）
-    
+
     Args:
         request: 分析リクエスト
         usecase: 分析実行ユースケース
-        
+
     Returns:
         分析レスポンス
     """
@@ -114,16 +117,15 @@ async def run_analysis(
             dataset=Dataset(url=request.dataset_url),
             target_date=TargetDate(value=date.fromisoformat(request.target_date)),
         )
-        
+
         # 分析を実行
         output = usecase.run(input_data)
-        
+
         # プレゼンターで変換
         response_data = AnalysisPresenter.present(output)
-        
+
         return AnalysisResponse(**response_data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-

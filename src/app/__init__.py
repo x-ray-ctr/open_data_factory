@@ -1,2 +1,1 @@
 """Polars Analysis Service"""
-
