@@ -190,6 +190,101 @@ class JobLauncher:
             },
         }
 
+    def _determine_job_status(self, job: Any) -> str:
+        """
+        Jobの状態を判定する
+
+        Args:
+            job: Kubernetes Jobオブジェクト
+
+        Returns:
+            状態文字列（completed, failed, running, unknown）
+        """
+        if job.status.succeeded:
+            return "completed"
+        elif job.status.failed:
+            return "failed"
+        elif job.status.active:
+            return "running"
+        elif job.status.conditions:
+            # 条件から状態を判定
+            for condition in job.status.conditions:
+                if condition.type == "Complete" and condition.status == "True":
+                    return "completed"
+                elif condition.type == "Failed" and condition.status == "True":
+                    return "failed"
+        return "unknown"
+
+    def list_jobs(self, label_selector: str | None = None) -> list[dict[str, Any]]:
+        """
+        Jobの一覧を取得する
+
+        Args:
+            label_selector: ラベルセレクター（例: "app=polars-analysis"）
+
+        Returns:
+            Jobの状態を含む辞書のリスト
+        """
+        if self._batch_api is None:
+            logger.warning("Kubernetes API not available. Returning empty list.")
+            return []
+
+        try:
+            # Job一覧を取得
+            if label_selector:
+                jobs = self._batch_api.list_namespaced_job(
+                    namespace=self.namespace,
+                    label_selector=label_selector,
+                )
+            else:
+                jobs = self._batch_api.list_namespaced_job(namespace=self.namespace)
+
+            result = []
+            for job in jobs.items:
+                # app=polars-analysisラベルのJobのみを対象とする
+                if job.metadata.labels and job.metadata.labels.get("app") == "polars-analysis":
+                    status = self._determine_job_status(job)
+
+                    creation_timestamp = (
+                        job.metadata.creation_timestamp.isoformat()
+                        if job.metadata.creation_timestamp
+                        else None
+                    )
+                    completion_time = (
+                        job.status.completion_time.isoformat()
+                        if job.status.completion_time
+                        else None
+                    )
+
+                    result.append(
+                        {
+                            "job_id": job.metadata.name,
+                            "status": status,
+                            "namespace": self.namespace,
+                            "creation_timestamp": creation_timestamp,
+                            "completion_time": completion_time,
+                            "succeeded": job.status.succeeded or 0,
+                            "failed": job.status.failed or 0,
+                            "active": job.status.active or 0,
+                        }
+                    )
+
+            # 作成日時の降順でソート（新しいものから）
+            result.sort(
+                key=lambda x: x["creation_timestamp"] or "",
+                reverse=True,
+            )
+
+            return result
+        except ApiException as e:
+            error_msg = f"Failed to list Jobs: {e.reason} - {e.body}"
+            logger.error(error_msg)
+            return []
+        except Exception as e:
+            error_msg = f"Failed to list Jobs: {str(e)}"
+            logger.error(error_msg)
+            return []
+
     def get_job_status(self, job_id: str) -> dict[str, Any]:
         """
         Jobの状態を取得する
@@ -214,23 +309,7 @@ class JobLauncher:
                 namespace=self.namespace,
             )
 
-            # Jobの状態を判定
-            status = "unknown"
-            if job.status.succeeded:
-                status = "completed"
-            elif job.status.failed:
-                status = "failed"
-            elif job.status.active:
-                status = "running"
-            elif job.status.conditions:
-                # 条件から状態を判定
-                for condition in job.status.conditions:
-                    if condition.type == "Complete" and condition.status == "True":
-                        status = "completed"
-                        break
-                    elif condition.type == "Failed" and condition.status == "True":
-                        status = "failed"
-                        break
+            status = self._determine_job_status(job)
 
             creation_timestamp = (
                 job.metadata.creation_timestamp.isoformat()

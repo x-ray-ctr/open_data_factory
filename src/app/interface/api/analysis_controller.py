@@ -75,6 +75,26 @@ async def create_analysis_job(
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
+@router.get("/jobs", response_model=list[dict[str, Any]])
+async def list_jobs(
+    job_launcher: JobLauncher = Depends(get_job_launcher),
+) -> list[dict[str, Any]]:
+    """
+    Jobの一覧を取得する
+
+    Args:
+        job_launcher: Job起動器
+
+    Returns:
+        Jobの状態のリスト
+    """
+    try:
+        jobs = job_launcher.list_jobs()
+        return jobs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+
+
 @router.get("/jobs/{job_id}", response_model=dict[str, Any])
 async def get_job_status(
     job_id: str,
