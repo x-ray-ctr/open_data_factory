@@ -1,13 +1,12 @@
 """Kubernetes Job起動の実装"""
 
-from typing import Optional
 from app.infrastructure.config.settings import Settings
 
 
 class JobLauncher:
     """Kubernetes Jobを起動する実装"""
 
-    def __init__(self, settings: Optional[Settings] = None):
+    def __init__(self, settings: Settings | None = None):
         """
         初期化
 

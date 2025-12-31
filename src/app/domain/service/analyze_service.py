@@ -1,6 +1,7 @@
 """分析サービスのドメインロジック"""
 
 import polars as pl
+
 from app.domain.model.analysis_result import AnalysisResult
 
 

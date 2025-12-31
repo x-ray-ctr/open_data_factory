@@ -1,12 +1,12 @@
 """依存注入（Composition Root）"""
 
+from app.infrastructure.config.settings import Settings
+from app.infrastructure.k8s.job_launcher import JobLauncher
+from app.infrastructure.loader.http_dataset_loader import HttpDatasetLoader
+from app.infrastructure.repository.s3_result_repository import S3ResultRepository
 from app.usecase.interactor.run_analysis_interactor import RunAnalysisInteractor
 from app.usecase.ports.output.dataset_loader import DatasetLoader
 from app.usecase.ports.output.result_repository import ResultRepository
-from app.infrastructure.loader.http_dataset_loader import HttpDatasetLoader
-from app.infrastructure.repository.s3_result_repository import S3ResultRepository
-from app.infrastructure.config.settings import Settings
-from app.infrastructure.k8s.job_launcher import JobLauncher
 
 
 def build_usecase(settings: Settings | None = None) -> RunAnalysisInteractor:

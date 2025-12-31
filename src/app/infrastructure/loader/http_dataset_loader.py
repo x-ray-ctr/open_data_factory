@@ -1,8 +1,9 @@
 """HTTP経由でデータセットを読み込む実装"""
 
 import polars as pl
-from app.usecase.ports.output.dataset_loader import DatasetLoader
+
 from app.domain.value_object.dataset import Dataset
+from app.usecase.ports.output.dataset_loader import DatasetLoader
 
 
 class HttpDatasetLoader(DatasetLoader):

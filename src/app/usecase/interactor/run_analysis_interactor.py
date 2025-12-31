@@ -1,11 +1,11 @@
 """分析実行のインタラクター"""
 
+from app.domain.service.analyze_service import analyze
+from app.usecase.dto.run_analysis_input import RunAnalysisInput
+from app.usecase.dto.run_analysis_output import RunAnalysisOutput
 from app.usecase.ports.input.run_analysis_usecase import RunAnalysisUseCase
 from app.usecase.ports.output.dataset_loader import DatasetLoader
 from app.usecase.ports.output.result_repository import ResultRepository
-from app.usecase.dto.run_analysis_input import RunAnalysisInput
-from app.usecase.dto.run_analysis_output import RunAnalysisOutput
-from app.domain.service.analyze_service import analyze
 
 
 class RunAnalysisInteractor(RunAnalysisUseCase):

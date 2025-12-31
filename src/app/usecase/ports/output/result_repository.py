@@ -1,6 +1,7 @@
 """結果リポジトリのポート（出力）"""
 
 from abc import ABC, abstractmethod
+
 from app.domain.model.analysis_result import AnalysisResult
 from app.domain.value_object.target_date import TargetDate
 

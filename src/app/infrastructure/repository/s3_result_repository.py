@@ -1,9 +1,9 @@
 """S3に結果を保存する実装"""
 
-from app.usecase.ports.output.result_repository import ResultRepository
 from app.domain.model.analysis_result import AnalysisResult
 from app.domain.value_object.target_date import TargetDate
 from app.infrastructure.config.settings import Settings
+from app.usecase.ports.output.result_repository import ResultRepository
 
 
 class S3ResultRepository(ResultRepository):

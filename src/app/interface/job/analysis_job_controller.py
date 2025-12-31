@@ -1,11 +1,12 @@
 """分析Jobのコントローラー"""
 
 from datetime import date
-from app.usecase.ports.input.run_analysis_usecase import RunAnalysisUseCase
-from app.usecase.dto.run_analysis_input import RunAnalysisInput
+
 from app.domain.value_object.dataset import Dataset
 from app.domain.value_object.target_date import TargetDate
 from app.infrastructure.config.settings import Settings
+from app.usecase.dto.run_analysis_input import RunAnalysisInput
+from app.usecase.ports.input.run_analysis_usecase import RunAnalysisUseCase
 
 
 def run_from_env(usecase: RunAnalysisUseCase) -> None:

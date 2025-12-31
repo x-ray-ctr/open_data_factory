@@ -1,6 +1,7 @@
 """分析実行ユースケースのポート（入力）"""
 
 from abc import ABC, abstractmethod
+
 from app.usecase.dto.run_analysis_input import RunAnalysisInput
 from app.usecase.dto.run_analysis_output import RunAnalysisOutput
 

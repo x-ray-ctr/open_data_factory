@@ -1,6 +1,7 @@
 """分析結果のドメインモデル"""
 
 from dataclasses import dataclass
+
 import polars as pl
 
 

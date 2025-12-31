@@ -1,9 +1,10 @@
 """FastAPIエントリーポイント"""
 
 from fastapi import FastAPI
-from app.interface.api.analysis_controller import router, get_usecase, get_job_launcher
-from app.wiring import build_usecase, build_job_launcher
+
 from app.infrastructure.config.settings import Settings
+from app.interface.api.analysis_controller import router
+from app.wiring import build_job_launcher, build_usecase
 
 
 def create_app() -> FastAPI:

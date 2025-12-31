@@ -1,16 +1,17 @@
 """分析APIのコントローラー"""
 
-from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
 from datetime import date
-from app.usecase.ports.input.run_analysis_usecase import RunAnalysisUseCase
-from app.usecase.dto.run_analysis_input import RunAnalysisInput
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+
 from app.domain.value_object.dataset import Dataset
 from app.domain.value_object.target_date import TargetDate
-from app.interface.presenter.analysis_presenter import AnalysisPresenter
 from app.infrastructure.k8s.job_launcher import JobLauncher
-
+from app.interface.presenter.analysis_presenter import AnalysisPresenter
+from app.usecase.dto.run_analysis_input import RunAnalysisInput
+from app.usecase.ports.input.run_analysis_usecase import RunAnalysisUseCase
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
@@ -71,14 +72,14 @@ async def create_analysis_job(
             message=f"Job {job_id} started",
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
-@router.get("/jobs/{job_id}", response_model=Dict[str, Any])
+@router.get("/jobs/{job_id}", response_model=dict[str, Any])
 async def get_job_status(
     job_id: str,
     job_launcher: JobLauncher = Depends(get_job_launcher),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Jobの状態を取得する
 
@@ -93,7 +94,7 @@ async def get_job_status(
         status = job_launcher.get_job_status(job_id)
         return status
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/run", response_model=AnalysisResponse)
@@ -126,6 +127,6 @@ async def run_analysis(
 
         return AnalysisResponse(**response_data)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e

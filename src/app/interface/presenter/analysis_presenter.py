@@ -1,14 +1,15 @@
 """分析結果のプレゼンター"""
 
+from typing import Any
+
 from app.usecase.dto.run_analysis_output import RunAnalysisOutput
-from typing import Dict, Any
 
 
 class AnalysisPresenter:
     """分析結果をAPIレスポンス形式に変換するプレゼンター"""
 
     @staticmethod
-    def present(output: RunAnalysisOutput) -> Dict[str, Any]:
+    def present(output: RunAnalysisOutput) -> dict[str, Any]:
         """
         分析結果をAPIレスポンス形式に変換する
 
