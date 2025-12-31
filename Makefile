@@ -12,17 +12,20 @@ job:
 install:
 	uv sync
 
-# テストを実行（今後追加予定）
+# テストを実行
 test:
-	@echo "Tests not implemented yet"
+	uv run pytest
 
-# リンターを実行（今後追加予定）
+# リンターを実行
 lint:
-	@echo "Linter not implemented yet"
+	uv run ruff check src/
 
-# コードフォーマット（今後追加予定）
+# コードフォーマット
 fmt:
-	@echo "Formatter not implemented yet"
+	uv run ruff format src/
+
+# リンターとフォーマットを同時に実行
+check: lint fmt
 
 # Jupyter Notebookを起動
 notebook:
