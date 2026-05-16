@@ -12,6 +12,11 @@ class Settings:
     s3_prefix: str = "analysis-results/daily"
     dataset_url: str = ""
     target_date: str = ""
+    # Ingestion platform paths
+    dropzone_path: str = "storage/dropzone"
+    raw_path: str = "storage/raw"
+    archive_path: str = "storage/archive"
+    duckdb_path: str = "duckdb/analytics.duckdb"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -21,4 +26,8 @@ class Settings:
             s3_prefix=os.getenv("S3_PREFIX", "analysis-results/daily"),
             dataset_url=os.getenv("DATASET_URL", ""),
             target_date=os.getenv("TARGET_DATE", ""),
+            dropzone_path=os.getenv("DROPZONE_PATH", "storage/dropzone"),
+            raw_path=os.getenv("RAW_PATH", "storage/raw"),
+            archive_path=os.getenv("ARCHIVE_PATH", "storage/archive"),
+            duckdb_path=os.getenv("DUCKDB_PATH", "duckdb/analytics.duckdb"),
         )

@@ -1,40 +1,55 @@
 """FastAPIエントリーポイント"""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.infrastructure.config.settings import Settings
-from app.wiring import build_job_launcher, build_usecase
+from app.infrastructure.watcher.dropzone_watcher import DropzoneWatcher
+from app.wiring import build_ingestion_components, build_job_launcher, build_usecase
 
 
 def create_app() -> FastAPI:
-    """
-    FastAPIアプリケーションを作成する
-
-    Returns:
-        FastAPIアプリケーション
-    """
-    app = FastAPI(title="Polars Analysis Service", version="0.1.0")
-
-    # 設定を読み込む
+    """FastAPIアプリケーションを作成する"""
     settings = Settings.from_env()
 
-    # 依存関係を構築
     usecase = build_usecase(settings)
     job_launcher = build_job_launcher(settings)
+    ingest_interactor, registry, view_manager = build_ingestion_components(settings)
+    watcher = DropzoneWatcher(ingest_interactor, settings.dropzone_path)
 
-    # ルーターをインポート
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        watcher.start()
+        yield
+        watcher.stop()
+
+    app = FastAPI(
+        title="Open Data Factory",
+        version="0.2.0",
+        lifespan=lifespan,
+    )
+
     from app.interface.api.analysis_controller import (
         get_job_launcher,
         get_usecase,
-        router,
+        router as analysis_router,
+    )
+    from app.interface.api.ingestion_controller import (
+        get_ingest_usecase,
+        get_registry,
+        get_view_manager,
+        router as ingestion_router,
     )
 
-    # FastAPIのdependency_overridesを使用して依存関係を設定
     app.dependency_overrides[get_usecase] = lambda: usecase
     app.dependency_overrides[get_job_launcher] = lambda: job_launcher
+    app.dependency_overrides[get_ingest_usecase] = lambda: ingest_interactor
+    app.dependency_overrides[get_registry] = lambda: registry
+    app.dependency_overrides[get_view_manager] = lambda: view_manager
 
-    # ルーターを登録
-    app.include_router(router)
+    app.include_router(analysis_router)
+    app.include_router(ingestion_router)
 
     return app
 
