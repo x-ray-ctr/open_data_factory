@@ -10,6 +10,8 @@ dependencies = [
     "uvicorn[standard]>=0.24.0",
     "pydantic>=2.5.0",
     "kubernetes>=28.0.0",
+    "duckdb>=0.10.0",
+    "watchdog>=3.0.0",
 ]
 
 [project.optional-dependencies]
@@ -56,3 +58,8 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=app --cov-report=term-missing"
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=7.0.0",
+]
